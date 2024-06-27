@@ -15,9 +15,7 @@ public class Game {
     private final Renderer renderer;
     private final Physics physics;
 
-    //TODO: Shenanigans Start
     private Vector2 strikeStart;
-    //TODO: Shenanigans End
 
     public Game(Renderer renderer, Physics physics) {
         this.renderer = renderer;
@@ -44,20 +42,12 @@ public class Game {
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
 
-        // TBD: This is just an example that illustrates how a raycast can be generated and
-        // how a force can be applied to an object. Replace this with your implementation of
-        // the cue and striking
-
-        //Ball.WHITE.getBody().applyForce(new Vector2(1, 0).multiply(3000));
-
         Vector2 strikeEnd = new Vector2(pX, pY);
         double strikeStartX = strikeStart.x;
         double strikeStartY = strikeStart.y;
 
-        // Calculate direction angle in radians
+        // calculate direction
         double dirAngle = Math.atan2(pY - strikeStartY, pX - strikeStartX);
-
-        // Calculate direction vector components
         double dirX = Math.cos(dirAngle);
         double dirY = Math.sin(dirAngle);
 
@@ -69,7 +59,9 @@ public class Game {
 
         results.forEach(r -> System.out.println(r.getBody().getUserData()));
 
-        results.get(0).getBody().applyForce(new Vector2(-dirX,-dirY).multiply(1000));
+        double distance = calculateDistance(strikeStart, strikeEnd);
+
+        results.get(0).getBody().applyForce(new Vector2(-dirX,-dirY).multiply(distance*2000));
 
         // reset Cue
         renderer.updateCueStartPosition(0,0);
@@ -138,4 +130,11 @@ public class Game {
         this.physics.addBodyToWorld(table.getBody());
         renderer.setTable(table);
     }
+
+    private double calculateDistance(Vector2 v1, Vector2 v2) {
+        double dx = v2.x - v1.x;
+        double dy = v2.y - v1.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
 }

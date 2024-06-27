@@ -48,9 +48,7 @@ public class Renderer extends AnimationTimer {
     private int player1Score;
     private int player2Score;
 
-
-    // TODO: MY SHIT
-
+    // cue values
     private double cueStartX;
     private double cueStartY;
     private double cueEndX;
@@ -64,7 +62,6 @@ public class Renderer extends AnimationTimer {
         this.cueEndY = y*400;
     }
 
-    // TODO: END MY SHIT
 
     private Optional<FrameListener> frameListener;
 
@@ -251,11 +248,9 @@ public class Renderer extends AnimationTimer {
     }
 
     private void drawCue() {
-        // TODO: draw cue
         if (cueEndX == 0 && cueEndY == 0) {
             return; // Don't draw the cue if cue position is not set
         }
-
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2.0);
         Affine transform = new Affine(poolCoords);

@@ -1,5 +1,6 @@
 package at.fhv.sysarch.lab4.physics;
 
+import at.fhv.sysarch.lab4.game.Game;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.Step;
 import org.dyn4j.dynamics.StepListener;
@@ -76,6 +77,13 @@ public class Physics implements ContactListener, StepListener {
     public boolean persist(PersistedContactPoint point) {
         // TBD: use this method to check if a ball and a pocket (sensor) overlap and notify
         // the necessary subsystems. For checking if a sensor is involved use point.isSensor()
+
+        if(point.isSensor()) {
+            System.out.println("SENSOR " + point.isSensor() + " " + point.getBody1().getUserData());
+            // removes it only for the physics, not for the renderer
+            world.removeBody(point.getBody1());
+        }
+
 
         return true;
     }
