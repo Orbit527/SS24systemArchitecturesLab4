@@ -27,8 +27,10 @@ public class Main extends Application {
             SCENE_WIDTH, 
             SCENE_HEIGHT,
                 physics);
-        
+
         Game game = new Game(renderer, physics);
+
+        physics.setBallPocketedListener(game);
 
         c.setOnMousePressed(game::onMousePressed);
         c.setOnMouseReleased(game::onMouseReleased);

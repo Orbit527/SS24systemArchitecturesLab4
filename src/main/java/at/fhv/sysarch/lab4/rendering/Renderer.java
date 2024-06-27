@@ -119,6 +119,7 @@ public class Renderer extends AnimationTimer {
     public void removeBall(Ball b) {
         this.balls.remove(b);
     }
+    public void resetBalls() {this.balls = new ArrayList<>();};
     
     public void setTable(Table t) {
         this.table = t;
@@ -249,7 +250,7 @@ public class Renderer extends AnimationTimer {
 
     private void drawCue() {
         if (cueEndX == 0 && cueEndY == 0) {
-            return; // Don't draw the cue if cue position is not set
+            return;
         }
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2.0);

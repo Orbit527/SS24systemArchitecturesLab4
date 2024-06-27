@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import at.fhv.sysarch.lab4.physics.BallPocketedListener;
 import at.fhv.sysarch.lab4.physics.Physics;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
@@ -11,11 +12,13 @@ import org.dyn4j.dynamics.RaycastResult;
 import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
-public class Game {
+public class Game implements BallPocketedListener {
     private final Renderer renderer;
     private final Physics physics;
 
     private Vector2 strikeStart;
+
+    private int count;
 
     public Game(Renderer renderer, Physics physics) {
         this.renderer = renderer;
@@ -52,12 +55,11 @@ public class Game {
         double dirY = Math.sin(dirAngle);
 
         Ray ray = new Ray(strikeStart, new Vector2(-dirX, -dirY));
-        System.out.println(ray);
         List<RaycastResult> results = new ArrayList<>();
 
         this.physics.getWorld().raycast(ray, 0, true, false, results );
 
-        results.forEach(r -> System.out.println(r.getBody().getUserData()));
+        //results.forEach(r -> System.out.println(r.getBody().getUserData()));
 
         double distance = calculateDistance(strikeStart, strikeEnd);
 
@@ -75,7 +77,6 @@ public class Game {
         double pX = renderer.screenToPhysicsX(x);
         double pY = renderer.screenToPhysicsY(y);
 
-        System.out.println(pX + " " + pY);
         renderer.updateCueEndPosition(pX,pY);
     }
 
@@ -135,6 +136,39 @@ public class Game {
         double dx = v2.x - v1.x;
         double dy = v2.y - v1.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    @Override
+    public boolean onBallPocketed(Ball b) {
+        renderer.removeBall(b);
+        count++;
+        if (count >= 2) {
+            resetWorld();
+        }
+        System.out.println("BALL POCKETED " + count);
+        return true;
+    }
+
+    private void resetWorld() {
+        count = 0;
+        renderer.resetBalls();
+
+        List<Ball> balls = new ArrayList<>();
+
+        for (Ball b : Ball.values()) {
+            if (b == Ball.WHITE)
+                continue;
+
+            balls.add(b);
+        }
+
+        this.placeBalls(balls);
+
+        // TODO: if white ball gets pocketed, he needs to be added a body to
+        Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+
+        renderer.addBall(Ball.WHITE);
+
     }
 
 }

@@ -1,5 +1,6 @@
 package at.fhv.sysarch.lab4.physics;
 
+import at.fhv.sysarch.lab4.game.Ball;
 import at.fhv.sysarch.lab4.game.Game;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.Step;
@@ -16,6 +17,13 @@ import java.sql.Statement;
 public class Physics implements ContactListener, StepListener {
 
     private final World world;
+
+    private BallPocketedListener ballPocketedListener;
+
+    public void setBallPocketedListener(BallPocketedListener listener) {
+        this.ballPocketedListener = listener;
+    }
+
 
     public Physics() {
         this.world = new World();
@@ -64,7 +72,7 @@ public class Physics implements ContactListener, StepListener {
     public boolean begin(ContactPoint point) {
         // TBD: use listener to notify necessary subsystems
 
-        System.out.println(point.getBody1().getUserData() + " " + point.getBody2().getUserData());
+        //System.out.println(point.getBody1().getUserData() + " " + point.getBody2().getUserData());
         return true;
     }
 
@@ -79,9 +87,9 @@ public class Physics implements ContactListener, StepListener {
         // the necessary subsystems. For checking if a sensor is involved use point.isSensor()
 
         if(point.isSensor()) {
-            System.out.println("SENSOR " + point.isSensor() + " " + point.getBody1().getUserData());
-            // removes it only for the physics, not for the renderer
+            // TODO: Only make it pocket balls when its more than half over the pocket... at the moment it pockets them by touch
             world.removeBody(point.getBody1());
+            ballPocketedListener.onBallPocketed((Ball) point.getBody1().getUserData());
         }
 
 
