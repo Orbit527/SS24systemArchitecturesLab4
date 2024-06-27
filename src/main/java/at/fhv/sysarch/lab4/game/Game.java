@@ -15,6 +15,10 @@ public class Game {
     private final Renderer renderer;
     private final Physics physics;
 
+    //TODO: Shenanigans Start
+    private Vector2 strikeStart;
+    //TODO: Shenanigans End
+
     public Game(Renderer renderer, Physics physics) {
         this.renderer = renderer;
         this.physics = physics;
@@ -28,25 +32,48 @@ public class Game {
         double pX = this.renderer.screenToPhysicsX(x);
         double pY = this.renderer.screenToPhysicsY(y);
 
+        strikeStart = new Vector2(pX,pY);
+        renderer.updateCueStartPosition(pX,pY);
+
+    }
+
+    public void onMouseReleased(MouseEvent e) {
+        double x = e.getX();
+        double y = e.getY();
+
+        double pX = this.renderer.screenToPhysicsX(x);
+        double pY = this.renderer.screenToPhysicsY(y);
+
         // TBD: This is just an example that illustrates how a raycast can be generated and
         // how a force can be applied to an object. Replace this with your implementation of
         // the cue and striking
 
         //Ball.WHITE.getBody().applyForce(new Vector2(1, 0).multiply(3000));
 
-        Vector2 start = new Vector2(pX, pY);
-        Vector2 dir = new Vector2(-1,0);
-        Ray ray = new Ray(start, dir);
+        Vector2 strikeEnd = new Vector2(pX, pY);
+        double strikeStartX = strikeStart.x;
+        double strikeStartY = strikeStart.y;
+
+        // Calculate direction angle in radians
+        double dirAngle = Math.atan2(pY - strikeStartY, pX - strikeStartX);
+
+        // Calculate direction vector components
+        double dirX = Math.cos(dirAngle);
+        double dirY = Math.sin(dirAngle);
+
+        Ray ray = new Ray(strikeStart, new Vector2(-dirX, -dirY));
+        System.out.println(ray);
         List<RaycastResult> results = new ArrayList<>();
 
         this.physics.getWorld().raycast(ray, 0, true, false, results );
 
         results.forEach(r -> System.out.println(r.getBody().getUserData()));
 
-        results.get(0).getBody().applyForce(new Vector2(-1,0).multiply(2000));
-    }
+        results.get(0).getBody().applyForce(new Vector2(-dirX,-dirY).multiply(1000));
 
-    public void onMouseReleased(MouseEvent e) {
+        // reset Cue
+        renderer.updateCueStartPosition(0,0);
+        renderer.updateCueEndPosition(0,0);
     }
 
     public void setOnMouseDragged(MouseEvent e) {
@@ -55,6 +82,9 @@ public class Game {
 
         double pX = renderer.screenToPhysicsX(x);
         double pY = renderer.screenToPhysicsY(y);
+
+        System.out.println(pX + " " + pY);
+        renderer.updateCueEndPosition(pX,pY);
     }
 
     private void placeBalls(List<Ball> balls) {

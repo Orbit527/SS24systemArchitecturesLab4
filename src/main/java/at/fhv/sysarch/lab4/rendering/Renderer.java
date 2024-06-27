@@ -48,6 +48,24 @@ public class Renderer extends AnimationTimer {
     private int player1Score;
     private int player2Score;
 
+
+    // TODO: MY SHIT
+
+    private double cueStartX;
+    private double cueStartY;
+    private double cueEndX;
+    private double cueEndY;
+    public void updateCueStartPosition(double x, double y) {
+        this.cueStartX = x*400;
+        this.cueStartY = y*400;
+    }
+    public void updateCueEndPosition(double x, double y) {
+        this.cueEndX = x*400;
+        this.cueEndY = y*400;
+    }
+
+    // TODO: END MY SHIT
+
     private Optional<FrameListener> frameListener;
 
     public Renderer(final GraphicsContext gc,
@@ -234,6 +252,16 @@ public class Renderer extends AnimationTimer {
 
     private void drawCue() {
         // TODO: draw cue
+        if (cueEndX == 0 && cueEndY == 0) {
+            return; // Don't draw the cue if cue position is not set
+        }
+
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(2.0);
+        Affine transform = new Affine(poolCoords);
+        gc.setTransform(transform);
+
+        gc.strokeLine(cueStartX, cueStartY, cueEndX, cueEndY);
     }
 
     private void drawFPS(double dt) {
@@ -323,4 +351,5 @@ public class Renderer extends AnimationTimer {
         // javafx draws ovals from top left corner
         this.gc.fillOval(-r, -r, d, d);
     }
+
 }
