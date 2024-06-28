@@ -48,6 +48,11 @@ public class Renderer extends AnimationTimer {
     private int player1Score;
     private int player2Score;
 
+    private String currentPlayer;
+
+    private String movingObjects;
+
+
     // cue values
     private double cueStartX;
     private double cueStartY;
@@ -111,6 +116,16 @@ public class Renderer extends AnimationTimer {
     public void setPlayer2Score(int player2Score) {
         this.player2Score = player2Score;
     }
+
+    public void setCurrentPlayer(String currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void setMovingObjects(String movingObjects) {
+        this.movingObjects = movingObjects;
+    }
+
+
 
     public void addBall(Ball b) {
         this.balls.add(b);
@@ -281,6 +296,11 @@ public class Renderer extends AnimationTimer {
         Affine player1ScoreTrans = new Affine(this.jfxCoords);
         Affine player2ScoreTrans = new Affine(this.jfxCoords);
 
+        Affine currentPlayerTrans = new Affine(this.jfxCoords);
+        Affine movingObjectsTrans = new Affine(this.jfxCoords);
+
+
+
         actionMsgTrans.appendTranslation(this.centerX - 250, 200);
         actionMsgTrans.appendScale(2, 2);
 
@@ -296,6 +316,12 @@ public class Renderer extends AnimationTimer {
         player2ScoreTrans.appendTranslation(this.centerX + 300, this.sceneHeight - 100);
         player2ScoreTrans.appendScale(5, 5);
 
+        currentPlayerTrans.appendTranslation(this.centerX - 250, this.sceneHeight - 400);
+        currentPlayerTrans.appendScale(5, 5);
+
+        movingObjectsTrans.appendTranslation(this.centerX - 250, this.sceneHeight - 300);
+        movingObjectsTrans.appendScale(5, 5);
+
         this.gc.setTransform(actionMsgTrans);
         this.gc.fillText(this.actionMessage, 0, 0);
 
@@ -310,6 +336,12 @@ public class Renderer extends AnimationTimer {
 
         this.gc.setTransform(player2ScoreTrans);
         this.gc.fillText(String.format("Player 2 score: %d", this.player2Score), 0, 0);
+
+        this.gc.setTransform(currentPlayerTrans);
+        this.gc.fillText(String.format("Current Player: %s", this.currentPlayer), 0, 0);
+
+        this.gc.setTransform(movingObjectsTrans);
+        this.gc.fillText(String.format("%s", this.movingObjects), 0, 0);
     }
 
     private void renderCushion(Polygon p) {

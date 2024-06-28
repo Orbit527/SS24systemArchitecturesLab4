@@ -11,8 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    private final static int SCENE_WIDTH  = 1920/2;
-    private final static int SCENE_HEIGHT = 1080/2;
+    private final static int SCENE_WIDTH  = 1920-400;
+    private final static int SCENE_HEIGHT = 1080-500;
 
     @Override
     public void start(Stage stage) {
@@ -31,6 +31,8 @@ public class Main extends Application {
         Game game = new Game(renderer, physics);
 
         physics.setBallPocketedListener(game);
+        physics.setObjectsRestListener(game);
+
 
         c.setOnMousePressed(game::onMousePressed);
         c.setOnMouseReleased(game::onMouseReleased);

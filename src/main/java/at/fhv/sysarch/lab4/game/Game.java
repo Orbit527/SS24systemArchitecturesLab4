@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import at.fhv.sysarch.lab4.physics.BallPocketedListener;
+import at.fhv.sysarch.lab4.physics.ObjectsRestListener;
 import at.fhv.sysarch.lab4.physics.Physics;
 import at.fhv.sysarch.lab4.rendering.Renderer;
 import javafx.scene.input.MouseEvent;
@@ -12,13 +13,27 @@ import org.dyn4j.dynamics.RaycastResult;
 import org.dyn4j.geometry.Ray;
 import org.dyn4j.geometry.Vector2;
 
-public class Game implements BallPocketedListener {
+public class Game implements BallPocketedListener, ObjectsRestListener {
     private final Renderer renderer;
     private final Physics physics;
 
     private Vector2 strikeStart;
 
     private int count;
+
+    private int scorePlayer1;
+    private int scorePlayer2;
+
+    private String currentPlayer;
+
+    private boolean pocketed;
+
+    private Vector2 positionWhiteBall;
+
+    private boolean objectsMoving;
+
+    private boolean swap;
+
 
     public Game(Renderer renderer, Physics physics) {
         this.renderer = renderer;
@@ -39,6 +54,12 @@ public class Game implements BallPocketedListener {
     }
 
     public void onMouseReleased(MouseEvent e) {
+        // set flag to see if balls get pocketed
+        pocketed = false;
+
+        // mark coordinates of white ball
+        positionWhiteBall = Ball.WHITE.getBody().getWorldCenter();
+
         double x = e.getX();
         double y = e.getY();
 
@@ -110,6 +131,9 @@ public class Game implements BallPocketedListener {
     }
 
     private void initWorld() {
+        currentPlayer = "Player1";
+        renderer.setCurrentPlayer("Player1");
+
         List<Ball> balls = new ArrayList<>();
         
         for (Ball b : Ball.values()) {
@@ -141,17 +165,33 @@ public class Game implements BallPocketedListener {
     @Override
     public boolean onBallPocketed(Ball b) {
         if (b == Ball.WHITE) {
-            System.out.println("WHITE BALL");
+            if (currentPlayer == "Player1") {
+                scorePlayer1--;
+            }
+            else {
+                scorePlayer2--;
+            }
             resetWhiteBall();
         }
+        else if (b == null) {}
         else {
+            pocketed = true;
             renderer.removeBall(b);
             count++;
+            if (currentPlayer == "Player1") {
+                scorePlayer1++;
+            }
+            else {
+                scorePlayer2++;
+            }
         }
         if (count >= 15) {
             resetWorld();
         }
-        System.out.println("BALL POCKETED " + count);
+
+        renderer.setPlayer1Score(scorePlayer1);
+        renderer.setPlayer2Score(scorePlayer2);
+
         return true;
     }
 
@@ -172,6 +212,8 @@ public class Game implements BallPocketedListener {
         this.placeBalls(balls);
 
         Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+        Ball.WHITE.getBody().setLinearVelocity(0, 0);
+        Ball.WHITE.getBody().setAngularVelocity(0);
         //this.physics.addBodyToWorld(Ball.WHITE.getBody());
 
         renderer.addBall(Ball.WHITE);
@@ -182,7 +224,7 @@ public class Game implements BallPocketedListener {
     }
 
     private void resetWhiteBall() {
-        Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+        Ball.WHITE.setPosition(positionWhiteBall.x, positionWhiteBall.y);
         Ball.WHITE.getBody().setLinearVelocity(0, 0);
         Ball.WHITE.getBody().setAngularVelocity(0);
 
@@ -194,5 +236,30 @@ public class Game implements BallPocketedListener {
         Table table = new Table();
         this.physics.addBodyToWorld(table.getBody());
         renderer.setTable(table);
+    }
+
+    @Override
+    public void onEndAllObjectsRest() {
+        objectsMoving = true;
+        renderer.setMovingObjects("Wait for Objects to stop moving");
+        swap = true;
+    }
+
+    @Override
+    public void onStartAllObjectsRest() {
+        renderer.setMovingObjects("Strike now");
+        objectsMoving = false;
+        // swap player, if no balls were pocketed
+        if (pocketed == false && swap == true) {
+            if (currentPlayer == "Player1") {
+                currentPlayer = "Player2";
+                renderer.setCurrentPlayer("Player2");
+            }
+            else {
+                currentPlayer = "Player1";
+                renderer.setCurrentPlayer("Player1");
+            }
+            swap = false;
+        }
     }
 }
