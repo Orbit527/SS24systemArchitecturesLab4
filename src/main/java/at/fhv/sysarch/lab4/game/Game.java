@@ -140,9 +140,15 @@ public class Game implements BallPocketedListener {
 
     @Override
     public boolean onBallPocketed(Ball b) {
-        renderer.removeBall(b);
-        count++;
-        if (count >= 2) {
+        if (b == Ball.WHITE) {
+            System.out.println("WHITE BALL");
+            resetWhiteBall();
+        }
+        else {
+            renderer.removeBall(b);
+            count++;
+        }
+        if (count >= 15) {
             resetWorld();
         }
         System.out.println("BALL POCKETED " + count);
@@ -160,15 +166,33 @@ public class Game implements BallPocketedListener {
                 continue;
 
             balls.add(b);
+            this.physics.addBodyToWorld(b.getBody());
         }
 
         this.placeBalls(balls);
 
-        // TODO: if white ball gets pocketed, he needs to be added a body to
         Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+        //this.physics.addBodyToWorld(Ball.WHITE.getBody());
 
         renderer.addBall(Ball.WHITE);
 
+        Table table = new Table();
+        this.physics.addBodyToWorld(table.getBody());
+        renderer.setTable(table);
     }
 
+    private void resetWhiteBall() {
+        Ball.WHITE.setPosition(Table.Constants.WIDTH * 0.25, 0);
+        Ball.WHITE.getBody().setLinearVelocity(0, 0);
+        Ball.WHITE.getBody().setAngularVelocity(0);
+
+        this.physics.addBodyToWorld(Ball.WHITE.getBody());
+
+        renderer.addBall(Ball.WHITE);
+
+        // Have to reset table, otherwise the table and pockets break
+        Table table = new Table();
+        this.physics.addBodyToWorld(table.getBody());
+        renderer.setTable(table);
+    }
 }
